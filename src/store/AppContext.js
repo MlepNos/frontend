@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useEffect } from "react";
+const API = process.env.REACT_APP_API_URL;
 
 const initialState = {
   games: [],
@@ -22,7 +23,7 @@ export const AppProvider = ({ children }) => {
 
   const fetchGames = async () => {
     try {
-      const response = await fetch("http://localhost:3003/api/game");
+      const response = await fetch(`${API}/game`);
       const data = await response.json();
       dispatch({ type: "SET_GAMES", payload: data });
     } catch (error) {
