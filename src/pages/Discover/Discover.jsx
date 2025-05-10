@@ -13,11 +13,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useAppContext } from "../../hooks/useAppContext";
 const API = process.env.REACT_APP_API_URL;
+import { useAuth } from "../../store/authContext";
 
 const Discover = () => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const { addGame } = useAppContext();
+const { token } = useAuth();
 
   const handleSearch = async () => {
     try {
@@ -31,27 +33,32 @@ const Discover = () => {
   };
 
   const handleSave = async (game) => {
-    try {
-      const res = await axios.post(`${API}/game`, game);
-      toast.success(`🎮 ${game.name} saved to your library!`);
-      addGame({
-  ...game,
-  image_url: game.background_image,
-  genres: game.genres.map(g => g.name).join(", "),
-  platforms: game.platforms.map(p => p.platform.name).join(", "),
-  stores: game.stores.map(s => s.store.name).join(", "),
-  esrb_rating: game.esrb_rating?.name || null,
-  release_date: game.released,
-}); // ✅ Instant update in context
-    } catch (err) {
-      if (err.response?.data?.message === "Game already exists") {
-        toast.info(`${game.name} is already in your library.`);
-      } else {
-        toast.error("Failed to save game.");
-        console.error(err);
-      }
+  try {
+    const res = await axios.post(`${API}/game`, game, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    toast.success(`🎮 ${game.name} saved to your library!`);
+    addGame({
+      ...game,
+      image_url: game.background_image,
+      genres: game.genres.map((g) => g.name).join(", "),
+      platforms: game.platforms.map((p) => p.platform.name).join(", "),
+      stores: game.stores.map((s) => s.store.name).join(", "),
+      esrb_rating: game.esrb_rating?.name || null,
+      release_date: game.released,
+    });
+  } catch (err) {
+    if (err.response?.data?.message === "Game already exists") {
+      toast.info(`${game.name} is already in your library.`);
+    } else {
+      toast.error("Failed to save game.");
+      console.error(err);
     }
-  };
+  }
+};
 
   return (
     <Box sx={{ padding: 4 }}>
