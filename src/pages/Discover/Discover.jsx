@@ -12,8 +12,9 @@ import {
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useAppContext } from "../../hooks/useAppContext";
-const API = process.env.REACT_APP_API_URL;
 import { useAuth } from "../../store/authContext";
+
+const API = process.env.REACT_APP_API_URL;
 
 const Discover = () => {
   const [search, setSearch] = useState("");
